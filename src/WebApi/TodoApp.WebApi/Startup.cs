@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using TodoApp.Application;
 using TodoApp.Application.Exceptions;
 using TodoApp.Application.Interface;
+using TodoApp.Application.Settings;
 using TodoApp.Persistence.Context;
 using TodoApp.Persistence.Extensions;
 
@@ -33,13 +34,17 @@ namespace TodoApp.WebApi
         {
             var migrationsAssembly = typeof(ApplicationDbContext).Assembly.GetName().Name;
             var connectionString = Configuration.GetConnectionString(nameof(ApplicationDbContext));
-
+           
+            var jwtSecretKey = Configuration.GetValue<string>("JwtSettings:jwtsecretkey");
+            services.Configure<JwtSettings>(Configuration.GetSection("JwtSettings"));
+            services.AddSingleton(Configuration.GetSection("JwtSettings").Get<JwtSettings>());
+            
             services
                 .AddHttpClient()
                 .AddHttpContextAccessor()
                 .AddDistributedMemoryCache();
 
-            services.AddApplicationRegistration();
+            services.AddApplicationRegistration(jwtSecretKey);
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Todo API", Version = "v1" });

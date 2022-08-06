@@ -12,7 +12,7 @@ namespace TodoApp.Application
 {
     public static class ServiceRegistration
     {
-        public static void AddApplicationRegistration(this IServiceCollection services)
+        public static void AddApplicationRegistration(this IServiceCollection services, string jwtKey)
         {
             var assm = Assembly.GetExecutingAssembly();
 
@@ -23,7 +23,7 @@ namespace TodoApp.Application
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestLoggerBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
 
-            var key = Encoding.ASCII.GetBytes("Q+%4523f4qv+^%AC+*4RWWsdf");
+            var key = Encoding.ASCII.GetBytes(jwtKey);
 
             services.AddAuthentication(x =>
             {

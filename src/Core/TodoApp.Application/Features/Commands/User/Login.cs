@@ -11,6 +11,7 @@ using TodoApp.Application.Dto.User;
 using TodoApp.Application.Exceptions;
 using TodoApp.Application.Extensions;
 using TodoApp.Application.Interface;
+using TodoApp.Application.Settings;
 using TodoApp.Application.Wappers;
 
 namespace TodoApp.Application.Features.Commands.User
@@ -33,10 +34,11 @@ namespace TodoApp.Application.Features.Commands.User
         public class Handler : IRequestHandler<Command, ServiceResponse<LoginResponseModel>>
         {
             private readonly IApplicationDbContext _applicationDbContext;
-
-            public Handler(IApplicationDbContext applicationDbContext)
+            private readonly JwtSettings _jwtSettings;
+            public Handler(IApplicationDbContext applicationDbContext, JwtSettings jwtSettings)
             {
                 _applicationDbContext = applicationDbContext;
+                _jwtSettings = jwtSettings;
             }
 
             public async Task<ServiceResponse<LoginResponseModel>> Handle(Command request, CancellationToken cancellationToken)
@@ -59,7 +61,7 @@ namespace TodoApp.Application.Features.Commands.User
 
             private string GenerateToken(Domain.Entities.User currentUser)
             {
-                var key = Encoding.ASCII.GetBytes("Q+%4523f4qv+^%AC+*4RWWsdf");
+                var key = Encoding.ASCII.GetBytes(_jwtSettings.JwtSecretKey);
 
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
@@ -68,7 +70,7 @@ namespace TodoApp.Application.Features.Commands.User
                     new Claim(nameof(currentUser.Id), currentUser.Id.ToString()),
                     new Claim(nameof(currentUser.Name), currentUser.Name),
                     }),
-                    Expires = System.DateTime.Now.AddDays(1),
+                    Expires = System.DateTime.Now.AddDays(_jwtSettings.JwtTokenExpireDay),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                 };
 
