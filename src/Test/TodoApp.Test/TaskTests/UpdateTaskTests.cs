@@ -44,7 +44,7 @@ namespace TodoApp.Test.TaskTests
             var taskEntity = Builder<Domain.Entities.Task>.CreateNew().Build();
             await _fakeContext.Tasks.AddAsync(taskEntity);
             await _fakeContext.SaveChangesAsync();
-            taskEntity.Title = "updatedDeliveryBlock";
+            taskEntity.Title = "update";
             A.CallTo(() => _mapper.Map<Domain.Entities.Task>(A<TaskDto>._)).WithAnyArguments().Returns(taskEntity);
             await _handler.Handle(_command, new CancellationToken());
             Assert.IsTrue(_fakeContext.Tasks.FirstOrDefaultAsync(d => d.Id == taskEntity.Id).Result.Title == taskEntity.Title);

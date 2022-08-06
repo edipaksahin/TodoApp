@@ -20,7 +20,7 @@ namespace TodoApp.Test.TaskTests
         public CompleteTaskTest()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(databaseName: "UpdateTodoHandlerTest")
+                .UseInMemoryDatabase(databaseName: "CompleteTodoHandlerTest")
                 .Options;
             _fakeContext = new ApplicationDbContext(options);
             _command = new CompleteTask.Command();
