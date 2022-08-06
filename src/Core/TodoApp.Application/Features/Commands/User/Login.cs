@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -43,7 +44,11 @@ namespace TodoApp.Application.Features.Commands.User
 
             public async Task<ServiceResponse<LoginResponseModel>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var user = _applicationDbContext.Users.Where(x => x.Email == request.Request.Email).FirstOrDefault();
+                var user = await _applicationDbContext
+                                 .Users
+                                 .Where(x => x.Email == request.Request.Email)
+                                 .AsNoTracking()
+                                 .FirstOrDefaultAsync();
 
                 if (user.IsNull())
                     throw new EntityNotFoundException("User", request.Request.Email);
